@@ -1,0 +1,23 @@
+{
+  "name": "z-muse",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/voice": "^0.6.0",
+    "discord.js": "^13.1.0",
+    "ffmpeg": "^0.0.4"
+  },
+  "devDependencies": {
+    "ascii-table": "^0.0.9",
+    "dotenv": "^10.0.0",
+    "ms": "^3.0.0-canary.1",
+    "ytdl-core": "^4.9.1"
+  }
+}

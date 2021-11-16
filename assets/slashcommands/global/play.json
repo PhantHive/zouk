@@ -1,0 +1,13 @@
+{
+  "name": "play",
+  "description": "Play songs.",
+  "options": [
+    {
+      "name": "song",
+      "description": "URL or name",
+      "type": "STRING",
+      "required": true
+    }
+  ]
+
+}

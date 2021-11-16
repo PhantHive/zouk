@@ -1,10 +1,9 @@
 const { MessageEmbed } = require('discord.js');
-const fs = require('fs');
-const ytdl = require('ytdl-core');
+const play = require('play-dl');
 const ffmpeg = require("ffmpeg");
 const wait = require('util').promisify(setTimeout);
 const { songInfo } = require('./src/songDetail.js');
-
+const { createReadStream } = require('fs');
 const {
     NoSubscriberBehavior,
     StreamType,
@@ -13,7 +12,7 @@ const {
     entersState,
     AudioPlayerStatus,
     VoiceConnectionStatus,
-    joinVoiceChannel,
+    joinVoiceChannel, AudioPlayer,
 } = require('@discordjs/voice');
 
 
@@ -30,11 +29,12 @@ module.exports = {
         let songUrl;
         let ytbChannel;
         let timestamp;
+        let streamOp = { seek: 0, volume: 1 };
+
+        let player = new AudioPlayer();
 
         const userChannel = member.voice.channel;
         if (!userChannel) interaction.reply("You are not in a voice channel. <a:akali:891838504517115954>");
-
-        let connection = await connectToChannel(userChannel);
 
 
         async function connectToChannel(channel) {
@@ -57,13 +57,29 @@ module.exports = {
                 timestamp = songInfos[4]
 
                 await interaction.editReply(`🎹: **Playing: ${title}**`);
-                await entersState(connection, VoiceConnectionStatus.Ready, 300_000);
                 return connection;
+
             } catch (error) {
                 connection.destroy();
                 throw error;
             }
         }
+
+        async function playSong() {
+            let stream = await play.stream(songUrl)
+            let resource = createAudioResource(stream.stream,
+                {
+                    inputType: StreamType.Arbitrary, inlineVolume:true
+                });
+            resource.volume.setVolume(0.7);
+            connection.subscribe(player);
+            player.play(resource);
+
+        }
+
+        let connection = await connectToChannel(userChannel);
+        await playSong();
+
 
 
 

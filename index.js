@@ -1,7 +1,8 @@
 const { Client, Intents, Collection} = require('discord.js');
 const myIntents = new Intents();
 myIntents.add(
-    Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS
+    Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS,
+    Intents.FLAGS.GUILD_VOICE_STATES
 );
 
 require('dotenv').config();

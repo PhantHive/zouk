@@ -1,0 +1,23 @@
+{
+  "name": "mp",
+  "description": "Fournisseur de mini projet",
+  "options": [
+    {
+      "name": "matiere",
+      "description": "Quelle matiere?",
+      "type": "STRING",
+      "choices": [
+        {
+          "name": "Physique",
+          "value": "physique"
+        },
+        {
+          "name": "Electronique",
+          "value": "elec"
+        }
+      ],
+      "required": true
+    }
+
+  ]
+}

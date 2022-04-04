@@ -5,7 +5,7 @@ myIntents.add(
     Intents.FLAGS.GUILD_VOICE_STATES
 );
 
-require('dotenv').config();
+//require('dotenv').config();
 
 const client = new Client({
     intents: myIntents

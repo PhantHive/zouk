@@ -4,6 +4,11 @@ const ffmpeg = require("ffmpeg");
 const wait = require('util').promisify(setTimeout);
 const { songInfo } = require('./src/songDetail.js');
 const { createReadStream } = require('fs');
+const fs = require('fs');
+const queueFile = './src/queue.json';
+const queues = require(queueFile);
+const path = require('path');
+
 const {
     NoSubscriberBehavior,
     StreamType,
@@ -18,6 +23,7 @@ const {
 
 module.exports = {
     name: "play",
+    aliases: ["p", "pl"],
     run: async (client, interaction) => {
         const song = interaction.options.getString("song");
         const guild = client.guilds.cache.get(interaction.guild.id);
@@ -45,19 +51,8 @@ module.exports = {
             });
             try {
                 interaction.reply("I'm ready to play music for you!");
-                await wait(1000);
 
-
-                let songInfos = await songInfo(song, interaction)
-
-                title = songInfos[0]
-                thumbnail = songInfos[1]
-                songUrl = songInfos[2]
-                ytbChannel = songInfos[3]
-                timestamp = songInfos[4]
-
-                await interaction.editReply(`🎹: **Playing: ${title}**`);
-                return connection;
+                await playSong(connection);
 
             } catch (error) {
                 connection.destroy();
@@ -65,7 +60,37 @@ module.exports = {
             }
         }
 
-        async function playSong() {
+        async function playSong(connection) {
+
+            let guildId = interaction.guild.id;
+
+            let songInfos = await songInfo(song, interaction)
+
+            title = songInfos[0]
+            thumbnail = songInfos[1]
+            songUrl = songInfos[2]
+            ytbChannel = songInfos[3]
+            timestamp = songInfos[4]
+
+            await interaction.editReply(`🎹: **Playing: ${title}**`);
+
+            if (!queues[guildId]) {
+                queues[guildId] = {
+                    "queue": [songUrl],
+                    "curPlay": 0
+                };
+            }
+            else {
+                queues[guildId]["queue"].push(songUrl);
+                queues[guildId]["curPlay"] = -1
+            }
+
+            fs.writeFile(path.join(__dirname, queueFile), JSON.stringify(queues, null, 2), function writeJSON(err) {
+                if (err) return console.log(err);
+            });
+
+
+
             let stream = await play.stream(songUrl)
             let resource = createAudioResource(stream.stream,
                 {
@@ -78,7 +103,7 @@ module.exports = {
         }
 
         let connection = await connectToChannel(userChannel);
-        await playSong();
+
 
 
 

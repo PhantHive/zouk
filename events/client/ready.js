@@ -1,5 +1,4 @@
 const { globalCmd, studentCmd, trainCmd } = require('../../dataHandler.js');
-const {trainCmd} = require("../../dataHandler");
 
 module.exports = (client) => {
     console.log("Z-MUSE ONLINE")

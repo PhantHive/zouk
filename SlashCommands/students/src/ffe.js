@@ -19,7 +19,7 @@ module.exports = {
                     return console.log('Unable to scan directory: ' + err);
                 }
                 //listing all files using forEach
-             
+
                 const row = new MessageActionRow()
 
                     .addComponents(
@@ -44,7 +44,7 @@ module.exports = {
                 })
 
                 await interaction.reply({
-                    content: `*FFE (fast file exporter) By IRIS Robotics* <a:Fast:960624588046364722>`,
+                    content: `*FFE (fast file exporter) By IRIS Robotics* <a:Fast:960621566536847440>`,
                     components: rows
                 })
                     .then(() => {

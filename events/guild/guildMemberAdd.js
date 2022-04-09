@@ -34,43 +34,45 @@ module.exports = (client, member) => {
                         let user = member.id;
                         let role;
                         let oldrole;
-                        if (guild.member(user)) {
 
-                            if (member.guild.id === "809190693196529704") {
-                                if (mailVerif["aero3_systeme"].includes(data.ipsaMail.toLowerCase())) {
-                                    role = member.guild.roles.cache.find(r => r.id === "932997263079399434");
-                                    oldrole = member.guild.roles.cache.find(r => r.name.includes("Incruste"));
-                                }
-                                else {
-                                    const incrusteRole = member.guild.roles.cache.find(role => role.name.includes("Incruste"));
-                                    member.roles.add(incrusteRole);
+                        const check = async () => {
+                            const verif = await guild.members.fetch(user);
 
-                                }
+                            if (verif) {
 
-                            }
-                            else {
-                                try {
-                                    role = member.guild.roles.cache.find(r => r.name === "IPSAlien");
-                                }
-                                catch (error) {}
+                                if (member.guild.id === "809190693196529704") {
+                                    if (mailVerif["aero3_systeme"].includes(data.ipsaMail.toLowerCase())) {
+                                        role = member.guild.roles.cache.find(r => r.id === "932997263079399434");
+                                        oldrole = member.guild.roles.cache.find(r => r.name.includes("Incruste"));
+                                    } else {
+                                        const incrusteRole = member.guild.roles.cache.find(role => role.name.includes("Incruste"));
+                                        member.roles.add(incrusteRole);
 
-                                try {
-                                    oldrole = member.guild.roles.cache.find(r => r.name === "Invité");
-                                }
-                                catch (error) {
-                                    try {
-                                        oldrole = member.guild.roles.cache.find(r => r.name === "Incruste");
                                     }
-                                    catch (error) {}
+
+                                } else {
+                                    try {
+                                        role = member.guild.roles.cache.find(r => r.name === "IPSAlien");
+                                    } catch (error) {
+                                    }
+
+                                    try {
+                                        oldrole = member.guild.roles.cache.find(r => r.name === "Invité");
+                                    } catch (error) {
+                                        try {
+                                            oldrole = member.guild.roles.cache.find(r => r.name === "Incruste");
+                                        } catch (error) {
+                                        }
+                                    }
                                 }
+
+
+                                guild.members.cache.get(user).roles.add(role);
+                                guild.members.cache.get(user).roles.remove(oldrole);
+
                             }
-
-
-
-                            guild.members.cache.get(user).roles.add(role);
-                            guild.members.cache.get(user).roles.remove(oldrole);
-
                         }
+                        check();
 
 
                     });

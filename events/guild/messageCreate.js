@@ -11,6 +11,8 @@ module.exports = (client, message) => {
 
         if (message.content.lastIndexOf("@ipsa.fr") !== -1) {
 
+            message.reply("La vérification email est cloturé pour le moment. Contactez un Modo si besoin!");
+            /*
             let mail = message.content;
 
             MV.findOne({
@@ -62,11 +64,12 @@ module.exports = (client, message) => {
 
 
                 }
-            );
+            ); */
 
         }
         else {
-            message.reply("Pour effectuer une vérification de mail, tape ton mail d'IPSA sous format **prenom.nom@ipsa.fr**");
+            message.reply("La vérification email est cloturé pour le moment. Contactez un Modo si besoin!");
+            //message.reply("Pour effectuer une vérification de mail, tape ton mail d'IPSA sous format **prenom.nom@ipsa.fr**");
         }
 
 

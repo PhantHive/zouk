@@ -4,13 +4,13 @@ const guildSchema = mongoose.Schema({
 
     _id: Number,
     discord_id: Number,
-    discord_tag: String,
-    first_name: String,
-    second_name: String,
-    promo: Number,
-    email: String
+    warning_of: Number,
+    warning_24: Number,
+    warning_25: Number,
+    warning_26: Number,
+    warning_27: Number
 
 });
 
 const myDB = mongoose.connection.useDb('<dbname>');
-module.exports = myDB.model('students', guildSchema);
+module.exports = myDB.model('warnings', guildSchema);

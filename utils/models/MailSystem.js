@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const guildSchema = mongoose.Schema({
 
-    _id: Number,
+    _id: String,
     discord_id: Number,
     discord_tag: String,
     first_name: String,
@@ -12,5 +12,5 @@ const guildSchema = mongoose.Schema({
 
 });
 
-const myDB = mongoose.connection.useDb('<dbname>');
+const myDB = mongoose.connection.useDb('ipsa_students');
 module.exports = myDB.model('students', guildSchema);

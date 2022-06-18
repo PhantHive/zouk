@@ -11,8 +11,8 @@ module.exports = (client, message) => {
 
         if (message.content.lastIndexOf("@ipsa.fr") !== -1) {
 
-            message.reply("La vérification email est cloturé pour le moment. Contactez un Modo si besoin!");
-            /*
+            //message.reply("La vérification email est cloturé pour le moment. Contactez un Modo si besoin!");
+
             let mail = message.content;
 
             MV.findOne({
@@ -28,8 +28,13 @@ module.exports = (client, message) => {
 
                     if (!mdata) {
                         await new MV({
-                            userId: message.author.id,
-                            ipsaMail: "",
+                            _id: Number('IPSA' + 880491243807846450 + message.author.id),
+                            discord_id: message.author.id,
+                            discord_tag: message.author.tag,
+                            first_name: "",
+                            second_name: "",
+                            promo: 0,
+                            email: ""
                         }).save()
 
                         //========================================VERIF MAIL
@@ -42,7 +47,7 @@ module.exports = (client, message) => {
 
 
                     }
-                    else if (mdata.ipsaMail !== "") {
+                    else if (mdata.email !== "") {
                         message.reply("Ce mail a déjà été enregistré.");
                     }
                     else {
@@ -64,7 +69,7 @@ module.exports = (client, message) => {
 
 
                 }
-            ); */
+            );
 
         }
         else {

@@ -20,9 +20,15 @@ module.exports = {
                 await new Promise(resolve => setTimeout(resolve, 1000))
                     .then(() => {
                         MV.findOne({
-                                userId: this.message.author.id
+                                _id: Number('IPSA' + 880491243807846450 + this.message.author.id)
                             },
                             async (err, mdata) => {
+
+                                if (err) {
+                                    console.log("Connection to the database failed: " + err);
+                                    return this.message.reply("Contactez un administrateur IPSA en lui mentionnant le problème suivant:" +
+                                        "```diff\n->Erreur de connexion avec la base de donnée 'students'```");
+                                }
 
                                 if (!mdata) {
                                     return this.message.reply("Un problème beaucoup trop important est survenu, contactez un admin.")
@@ -33,7 +39,7 @@ module.exports = {
                                 let mailFound = false;
 
 
-                                if (mdata.ipsaMail === "") {
+                                if (mdata.email === "") {
                                     for (const promo of Object.keys(mailVerif)) {
                                         if (mailVerif[promo].includes(this.mail.toLowerCase())) {
                                             //this.message.channel.send(this.mail);
@@ -89,16 +95,26 @@ module.exports = {
                                                             await this.message.channel.send({content: `***${fullName}*** Tu appartiens à la promo ***${promo}***, 
                                 tu es **verifié** sur ***${guild}*** en accord avec notre base de donnée.`});
 
-                                                            mdata.ipsaMail = this.mail.toLowerCase();
 
+                                                            // ---------------------
+                                                            // database registration
+                                                            // ---------------------
 
+                                                            // to be changed every year:
+                                                            const promo_table = {
+                                                                "aero1": 26,
+                                                                "aero2": 25,
+                                                                "aero3": 24,
+                                                                "aero4": 23,
+                                                                "aero5": 22
+                                                            }
+
+                                                            mdata.first_name = firstName;
+                                                            mdata.second_name = surName;
+                                                            mdata.email = this.mail.toLowerCase();
+                                                            mdata.promo = promo_table[promo];
 
                                                             member.roles.add(role).catch(() => {})
-
-
-
-
-
 
                                                             try {
                                                                 member.roles.remove(oldrole).catch(() => {
@@ -108,16 +124,8 @@ module.exports = {
                                                             }
                                                             catch (e) {}
 
-
-
-
-
                                                             mdata.save();
                                                         }
-
-
-
-
 
                                                         return this.mail;
 
@@ -144,7 +152,7 @@ module.exports = {
                                         this.message.reply("Il semblerait que tu te sois trompé dans l'écriture de ton mail. " +
                                             "Si tu penses qu'il s'agit d'une erreur provenant du bot je t'invite à mp un responsable discord ou à nous écrire dans le channel #general ou #idee-bugs.");
                                     }
-                                } else if (mdata.ipsaMail === this.mail) {
+                                } else if (mdata.email === this.mail) {
                                     this.message.reply(`Ton compte a déjà été verifié! <:drakeno:630099103220760576> `).then(m => m.delete({timeout: 6000}));
                                     return false;
                                 }
@@ -164,10 +172,10 @@ module.exports = {
             async startVerif() {
 
 
-                MV.findOne({ipsaMail: this.mail.toLowerCase()},
+                MV.findOne({email: this.mail.toLowerCase()},
                     async (err, data) => {
                         if (data) {
-                            if (data.userId !== this.message.author.id) {
+                            if (data.discord_id !== this.message.author.id) {
                                 this.message.reply("Tu ne peux pas prendre l'identité de quelqu'un d'autre Mr Who! Si tu penses qu'il s'agit d'une erreur MP un admin.");
                                 return false;
                             }

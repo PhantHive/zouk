@@ -12,5 +12,5 @@ const guildSchema = mongoose.Schema({
 
 });
 
-const myDB = mongoose.connection.useDb('<dbname>');
+const myDB = mongoose.connection.useDb('ipsa_students');
 module.exports = myDB.model('warnings', guildSchema);

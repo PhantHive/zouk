@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 module.exports = {
     init: () => {
         const dbOptions = {
@@ -11,7 +12,7 @@ module.exports = {
             family: 4
         };
 
-        mongoose.connect(`mongodb+srv://PhantHive:${process.env.DB}@cluster0.vrloe.mongodb.net/<dbname>?retryWrites=true&w=majority`, dbOptions);
+        mongoose.connect(`mongodb+srv://PhantHive:${process.env.DB}@iris.txxhe.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`, dbOptions);
         mongoose.Promise = global.Promise;
 
         mongoose.connection.on('connected', () => {

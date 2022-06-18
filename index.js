@@ -7,7 +7,7 @@ myIntents.add(
     Intents.FLAGS.GUILD_MEMBERS
 );
 
-//require('dotenv').config();
+require('dotenv').config();
 
 const client = new Client({
     partials: ["CHANNEL"],

@@ -22,7 +22,7 @@ module.exports = async (client, interaction) => {
             const embed = new MessageEmbed()
                 .setColor('#0099ff')
                 .setTitle('QUESTIONS (2/3)')
-                .setDescription('> Renseigne moi ton numéro INE (Tu trouveras ce N° sur le relevé de notes du BACCALAUREAT de français ou sur parcoursup.' +
+                .setDescription('> Renseigne moi ton numéro INE (Tu trouveras ce N° sur le relevé de notes du BACCALAUREAT de français ou sur parcoursup).' +
                     '\nTu as juste à m\'écrire ce numéro à la suite de mon message.');
 
             await interaction.update({ embeds: [embed], components: [ ]});

@@ -81,9 +81,12 @@ module.exports = async (client, message) => {
                     await chann.messages.fetch()
                         .then(messages => {
                             messages.forEach(msg => {
-                                if (msg.content.includes(message.author.id)) {
-                                    already_verif = true
-                                }
+                                msg.embeds.forEach((embed) => {
+                                    if (embed.title.includes(message.author.id)) {
+                                        already_verif = true
+                                    }
+                                })
+
                             });
                         });
                 });
@@ -111,7 +114,8 @@ module.exports = async (client, message) => {
                     .setDescription('> J\'espère que tu vas bien, procédons à la vérification' +
                         '\n> Toute tes informations (INE/NOM/PRENOM) seront transmises sur un serveur de stockage temporaire et seront supprimés après ' +
                         'vérification finale.' +
-                        '\n> Souhaites-tu procéder ?');
+                        '\n> Souhaites-tu procéder ?')
+                    .setImage('https://c.tenor.com/7-CNilpY-l8AAAAd/link-start-sao.gif')
 
                 await message.reply({ embeds: [embed], components: [row] });
             }

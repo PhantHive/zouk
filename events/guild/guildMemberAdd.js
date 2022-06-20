@@ -12,9 +12,9 @@ module.exports = (client, member) => {
         async(err, data) => {
             if (!data) {
                 member.createDM().then(channel => {
-                    channel.send("Bonjour je suis chargé de te vérifier!\n " +
+                    channel.send("Bonjour, je suis chargé de te vérifier!\n " +
                         "Envoie ton mail sous format: **prenom.nom@ipsa.fr**\n" +
-                        "(environs 5 secondes pour traiter la demande)")
+                        "(environ 5 secondes sont nécessaire pour traiter ta demande)")
 
                 }).catch(err => console.log(err))
 
@@ -25,7 +25,7 @@ module.exports = (client, member) => {
             }
             else {
                 member.createDM().then(channel => {
-                    channel.send("Bonjour tu as déjà été vérifé en accord avec notre base de données!\n" +
+                    channel.send("Bonjour, tu as déjà été vérifé en accord avec notre base de données!\n" +
                         "Je procède aux vérifications serveur.");
 
                     let guilds = ['880491243807846450', '880499115878932571', '755084203779162151', '608155753748103170', '809190693196529704', '932332814433673227', '932333114326405140'];

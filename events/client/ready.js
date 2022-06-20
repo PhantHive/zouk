@@ -1,4 +1,4 @@
-const { globalCmd, studentCmd, trainCmd } = require('../../dataHandler.js');
+const { globalCmd, studentCmd, trainCmd } = require('../../handler/slashData.js');
 
 module.exports = (client) => {
     console.log("Z-MUSE ONLINE")

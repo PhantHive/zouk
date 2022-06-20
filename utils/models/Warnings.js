@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const guildSchema = mongoose.Schema({
 
-    _id: Number,
     discord_id: Number,
     warning_of: Number,
     warning_24: Number,

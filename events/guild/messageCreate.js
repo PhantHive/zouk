@@ -1,7 +1,8 @@
 const { verification } = require("./check/checkMail");
 const MV = require('../../utils/models/MailSystem');
+const { MessageActionRow, MessageButton, MessageEmbed} = require("discord.js");
 
-module.exports = (client, message) => {
+module.exports = async (client, message) => {
 
 
     if (message.author.bot) return;
@@ -28,7 +29,6 @@ module.exports = (client, message) => {
 
                     if (!mdata) {
                         await new MV({
-                            _id: Number('IPSA' + 880491243807846450 + message.author.id),
                             discord_id: message.author.id,
                             discord_tag: message.author.tag,
                             first_name: "",
@@ -63,29 +63,62 @@ module.exports = (client, message) => {
 
                     }
 
-
-
-
-
-
                 }
             );
 
         }
         else {
-            message.reply("La vérification email est cloturé pour le moment. Contactez un Modo si besoin!");
+            // message.reply("La vérification email est cloturée pour le moment. Contactez un modérateur si besoin!");
             //message.reply("Pour effectuer une vérification de mail, tape ton mail d'IPSA sous format **prenom.nom@ipsa.fr**");
         }
 
+        // temporary
+        if (message.content.includes("linkstart")) {
+
+            let already_verif = false;
+            await client.channels.fetch("988195875367030815")
+                .then(async chann => {
+                    await chann.messages.fetch()
+                        .then(messages => {
+                            messages.forEach(msg => {
+                                if (msg.content.includes(message.author.id)) {
+                                    already_verif = true
+                                }
+                            });
+                        });
+                });
+
+            if (already_verif) {
+                message.reply("Vous êtes déjà vérifié. Vous avez perdu le lien? le voici: https://discord.gg/tEC9eTKZef")
+            }
+            else {
+                const row = new MessageActionRow()
+                    .addComponents(
+                        new MessageButton()
+                            .setCustomId('yes')
+                            .setLabel('OUI')
+                            .setStyle('PRIMARY'),
+
+                        new MessageButton()
+                            .setCustomId('no')
+                            .setLabel('NON...')
+                            .setStyle('DANGER'),
+                    );
+
+                const embed = new MessageEmbed()
+                    .setColor('#0099ff')
+                    .setTitle('QUESTIONS (1/3)')
+                    .setDescription('> J\'espère que tu vas bien, procédons à la vérification' +
+                        '\n> Toute tes informations (INE/NOM/PRENOM) seront transmises sur un serveur de stockage temporaire et seront supprimés après ' +
+                        'vérification finale.' +
+                        '\n> Souhaites-tu procéder ?');
+
+                await message.reply({ embeds: [embed], components: [row] });
+            }
+
+        }
 
     }
-
-
-
-
-
-
-
 
 
 }

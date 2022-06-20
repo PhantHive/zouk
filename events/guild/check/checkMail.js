@@ -1,6 +1,9 @@
 const MV = require('../../../utils/models/MailSystem');
-
 let mailVerif = require("../../../assets/admin/mailsVerif.json")
+
+// aes encryption
+const AES = require('crypto-js/aes');
+//const Utf8 = require('crypto-js/enc-utf8');
 
 module.exports = {
 
@@ -20,7 +23,7 @@ module.exports = {
                 await new Promise(resolve => setTimeout(resolve, 1000))
                     .then(() => {
                         MV.findOne({
-                                _id: Number('IPSA' + 880491243807846450 + this.message.author.id)
+                                discord_id: this.message.author.id
                             },
                             async (err, mdata) => {
 
@@ -105,13 +108,14 @@ module.exports = {
                                                                 "aero1": 26,
                                                                 "aero2": 25,
                                                                 "aero3": 24,
+                                                                "aero3_systeme": 24,
                                                                 "aero4": 23,
                                                                 "aero5": 22
                                                             }
 
-                                                            mdata.first_name = firstName;
-                                                            mdata.second_name = surName;
-                                                            mdata.email = this.mail.toLowerCase();
+                                                            mdata.first_name = AES.encrypt(firstName, process.env.AES).toString();
+                                                            mdata.second_name = AES.encrypt(surName, process.env.AES).toString();
+                                                            mdata.email = AES.encrypt(this.mail.toLowerCase(), process.env.AES).toString();
                                                             mdata.promo = promo_table[promo];
 
                                                             member.roles.add(role).catch(() => {})

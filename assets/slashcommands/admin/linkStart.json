@@ -1,0 +1,5 @@
+{
+  "name": "linkstart",
+  "description": "Send a DM to all user requested (see the JS file)",
+  "default_permission" : false
+}

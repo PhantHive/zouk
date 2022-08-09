@@ -1,0 +1,5 @@
+{
+  "name": "dbtransfer",
+  "description": "ma bite",
+  "default_permission" : false
+}

@@ -72,6 +72,7 @@ module.exports = async (client, message) => {
             //message.reply("Pour effectuer une vérification de mail, tape ton mail d'IPSA sous format **prenom.nom@ipsa.fr**");
         }
 
+
         // temporary
         if (message.content.includes("linkstart")) {
 
@@ -112,7 +113,7 @@ module.exports = async (client, message) => {
                     .setColor('#0099ff')
                     .setTitle('QUESTIONS (1/3)')
                     .setDescription('> J\'espère que tu vas bien, procédons à la vérification' +
-                        '\n> Toute tes informations (INE/NOM/PRENOM) seront transmises sur un serveur de stockage temporaire et seront supprimés après ' +
+                        '\n> Toutes tes informations (INE/NOM/PRENOM) seront transmises sur un serveur de stockage temporaire et seront supprimées après ' +
                         'vérification finale.' +
                         '\n> Souhaites-tu procéder ?')
                     .setImage('https://c.tenor.com/7-CNilpY-l8AAAAd/link-start-sao.gif')

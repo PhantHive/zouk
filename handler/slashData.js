@@ -28,7 +28,8 @@ async function trainCmd(Client, guildId) {
         require('../assets/slashcommands/students/mp.json'),
         require('../assets/slashcommands/students/tp.json'),
         require('../assets/slashcommands/students/fiche.json'),
-        require('../assets/slashcommands/admin/linkStart.json')
+        require('../assets/slashcommands/admin/linkStart.json'),
+        require('../assets/slashcommands/admin/dbtransfer.json')
 
     ]
     await Client.guilds.cache.get(guildId)?.commands.set(tData);

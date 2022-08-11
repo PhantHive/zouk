@@ -8,7 +8,7 @@ async function globalCmd(Client) {
     await Client.application?.commands.set(gData);
 }
 
-
+/*
 async function studentCmd(Client, guildId) {
     const sData = [
 
@@ -19,7 +19,7 @@ async function studentCmd(Client, guildId) {
 
     ]
     await Client.guilds.cache.get(guildId)?.commands.set(sData);
-}
+}*/
 
 async function trainCmd(Client, guildId) {
     const tData = [

@@ -17,7 +17,7 @@ module.exports = async (client, message) => {
             let mail = message.content;
 
             MV.findOne({
-                    userId: message.author.id
+                    discord_id: message.author.id
                 },
 
                 async(err, mdata) => {

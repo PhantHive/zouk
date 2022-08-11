@@ -6,7 +6,7 @@ module.exports = (client, member) => {
 
 
     MV.findOne({
-            userId: member.id
+            discord_id: member.id
         },
 
         async(err, data) => {

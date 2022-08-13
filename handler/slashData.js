@@ -24,16 +24,13 @@ async function studentCmd(Client, guildId) {
 async function trainCmd(Client, guildId) {
     const tData = [
 
-
-        require('../assets/slashcommands/students/mp.json'),
-        require('../assets/slashcommands/students/tp.json'),
-        require('../assets/slashcommands/students/fiche.json'),
         require('../assets/slashcommands/admin/linkStart.json'),
-        require('../assets/slashcommands/admin/dbtransfer.json')
+        require('../assets/slashcommands/admin/dbtransfer.json'),
+        require('../assets/slashcommands/global/welcome.json')
 
     ]
     await Client.guilds.cache.get(guildId)?.commands.set(tData);
 }
 
 
-module.exports = { globalCmd, studentCmd, trainCmd }
+module.exports = { globalCmd, trainCmd }

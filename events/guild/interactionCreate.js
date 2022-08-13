@@ -1,4 +1,19 @@
-const {MessageEmbed, MessageActionRow, MessageButton} = require("discord.js");
+const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
+const { customThemeWelcome, customColorWelcome} = require("../../SlashCommands/global/src/welcome/custom");
+const wait = require('node:timers/promises').setTimeout;
+
+const isChannelValid = async (channel) => new Promise((resolve, reject) => {
+
+    const id = Number(channel);
+    if (Number.isInteger(id) && id !== 0 ) {
+        resolve("Thank you! I will send welcome message in this channel.");
+    }
+    else {
+        reject("Sorry, I can't send welcome message in this channel. It is probably not a valid channel.");
+    }
+
+})
+
 module.exports = async (client, interaction) => {
 
 
@@ -9,7 +24,52 @@ module.exports = async (client, interaction) => {
 
     }
 
+    if (interaction.isSelectMenu()) {
 
+
+        // welcome message
+        if (interaction.customId === "channel_id") {
+            if (interaction.values[0] === "manually") {
+                await interaction.update({ content: "Please write the channel you want me to send welcome message in. (Either you can tag the channel #channel or give me the ID)", components: [] })
+
+                const filter = i => i.author.id === interaction.author.id;
+                const collector = interaction.channel.createMessageCollector(filter, { time: 30000 });
+
+                collector.on("collect", async msg => {
+                    await isChannelValid(msg.content)
+                        .then(async res => {
+                            await interaction.update({ content: res, components: [] });
+                            collector.stop();
+                            await msg.delete({ timeout: 15000 })
+                            await wait(1000);
+                            await customThemeWelcome(client, interaction);
+                        })
+                        .catch(err => console.log(err));
+                })
+
+            }
+            else {
+                await isChannelValid(interaction.values[0])
+                    .then(async res => {
+                        await interaction.update({ content: res, components: [] });
+                        await wait(2000);
+                        await customThemeWelcome(client, interaction);
+                    })
+                    .catch(err => console.log(err));
+            }
+        }
+
+        if (interaction.customId === "theme") {
+            //await interaction.editReply({ content: `You have choosen ${interaction.values[0]} as your welcome message theme.` });
+            await interaction.update({ content: `You have choosen ${interaction.values[0]} as your welcome message theme.`, components: [] });
+            await customColorWelcome(client, interaction);
+        }
+        if (interaction.customId === "color") {
+            //await interaction.editReply({ content: "Your welcome message is fully setup! Congrats my boy" });
+            await interaction.update({ content: "Your welcome message is fully setup! Congrats my boy", components: [] });
+        }
+
+    }
 
     if (interaction.isButton()) {
 

@@ -1,10 +1,11 @@
-const { Client, Intents, Collection} = require('discord.js');
-const myIntents = new Intents();
+const { Client, IntentsBitField, Collection} = require('discord.js');
+
+const myIntents = new IntentsBitField();
 myIntents.add(
-    Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS,
-    Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.DIRECT_MESSAGES,
-    Intents.FLAGS.DIRECT_MESSAGE_TYPING, Intents.FLAGS.GUILD_PRESENCES,
-    Intents.FLAGS.GUILD_MEMBERS
+    IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.GuildIntegrations,
+    IntentsBitField.Flags.GuildVoiceStates, IntentsBitField.Flags.DirectMessages,
+    IntentsBitField.Flags.DirectMessageTyping, IntentsBitField.Flags.GuildPresences,
+    IntentsBitField.Flags.GuildMembers
 );
 
 require('dotenv').config();

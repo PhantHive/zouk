@@ -105,7 +105,7 @@ module.exports = async (client, member) => {
                 ctx.strokeStyle = "black"
                 ctx.lineWidth = 2;
                 ctx.shadowColor = "white";
-                ctx.shadowBlur = 15;
+                ctx.shadowBlur = 5;
                 ctx.strokeText('Information en message privé', 355, 420);
                 ctx.fillText('Information en message privé', 355, 420);
 
@@ -126,7 +126,7 @@ module.exports = async (client, member) => {
                 ctx.closePath();
                 ctx.clip();
 
-
+                ctx.shadowBlur = 0;
                 const avatar = await Canvas.loadImage(member.user.displayAvatarURL({ extension: 'png' }));
                 ctx.drawImage(avatar, 300, 40, 200, 200);
                 const attachment = new AttachmentBuilder(canvas.toBuffer(), 'welcome-image.png');

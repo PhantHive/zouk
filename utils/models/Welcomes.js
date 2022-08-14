@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 const guildSchema = mongoose.Schema({
 
-    server_id: Number,
-    channel_id: Number,
+    server_id: String,
+    channel_id: String,
     theme: Number, //image category
     color: String, //color
 

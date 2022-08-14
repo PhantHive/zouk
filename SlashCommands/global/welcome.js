@@ -11,7 +11,7 @@ module.exports = {
 
 
         WDB.findOne({
-                server_id: interaction.guild.id
+                server_id: `${interaction.guild.id}`
             },
             async (err, data) => {
 

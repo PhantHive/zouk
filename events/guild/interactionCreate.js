@@ -43,15 +43,15 @@ module.exports = async (client, interaction) => {
 
                     if (!data) {
                         await new WDB({
-                            server_id: interaction.guild.id,
-                            channel_id: 0,
+                            server_id: `${interaction.guild.id}`,
+                            channel_id: "0",
                             theme: 0,
                             color: "#000000"
                         }).save();
                     }
                     else {
 
-                        if (data.channel_id !== 0) {
+                        if (data.channel_id !== "0") {
                             await interaction.update({ content: "The channel id has already been set. If you want to change it use /editwelcome." +
                                     "\nGoing to the next step."});
                             await wait(2500);
@@ -81,7 +81,7 @@ module.exports = async (client, interaction) => {
                                 await isChannelValid(interaction.values[0])
                                     .then(async res => {
                                         await interaction.update({ content: res, components: [] });
-                                        data.channel_id = interaction.values[0];
+                                        data.channel_id = `${interaction.values[0]}`;
                                         await wait(2000);
                                         await customThemeWelcome(client, interaction);
                                     })

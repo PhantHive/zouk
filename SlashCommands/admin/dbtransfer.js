@@ -1,4 +1,3 @@
-const MV = require("../../utils/models/MailSystem");
 const mailVerif = require("../../assets/admin/mailsVerif.json");
 const AES = require("crypto-js/aes");
 

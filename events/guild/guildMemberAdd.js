@@ -4,6 +4,7 @@ let mailVerif = require("../../assets/admin/mailsVerif.json")
 
 module.exports = (client, member) => {
 
+    let guilds = ['880491243807846450', '880499115878932571', '755084203779162151', '608155753748103170', '809190693196529704', '932332814433673227', '932333114326405140'];
 
     MV.findOne({
             discord_id: member.id
@@ -82,8 +83,5 @@ module.exports = (client, member) => {
 
         }
     )
-
-
-
 
 }

@@ -12,17 +12,17 @@ const customThemeWelcome = async (client, interaction) => {
                 {
                     label: "Planes",
                     emoji: "1008063352569872465",
-                    value: "planes",
+                    value: "0",
                 },
                 {
                     label: "Waifu",
                     emoji: "1008062691765653554",
-                    value: "waifu",
+                    value: "1",
                 },
                 {
                     label: "Landscapes",
                     emoji: "1008063338355359834",
-                    value: "landscapes",
+                    value: "2",
                 }
             )
     )

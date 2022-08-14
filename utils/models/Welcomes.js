@@ -4,7 +4,7 @@ const guildSchema = mongoose.Schema({
 
     server_id: Number,
     channel_id: Number,
-    img_cat: Number, //image category
+    theme: Number, //image category
     color: String, //color
 
 });

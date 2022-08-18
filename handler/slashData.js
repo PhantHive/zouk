@@ -2,7 +2,8 @@
 async function globalCmd(Client) {
     const gData = [
 
-        require('../assets/slashcommands/global/play.json')
+        require('../assets/slashcommands/global/play.json'),
+        require('../assets/slashcommands/global/welcome.json')
 
     ]
     await Client.application?.commands.set(gData);

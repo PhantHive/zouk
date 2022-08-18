@@ -1,4 +1,30 @@
 {
   "name": "welcome",
-  "description": "Setup from A to Z the welcome message for YOUR server :)"
+  "description": "Setup from A to Z the welcome message for YOUR server :)",
+  "options": [
+    {
+      "name": "config",
+      "description": "Configure the server welcome message",
+      "type": 3,
+      "choices": [
+        {
+          "name": "setup",
+          "description": "Setup the welcome message",
+          "value": "setup"
+        },
+        {
+          "name": "edit",
+          "description": "Edit the welcome message",
+          "value": "edit"
+        },
+        {
+          "name": "reset",
+          "description": "Reset the welcome message",
+          "value": "reset"
+        }
+
+      ],
+      "required": true
+    }
+  ]
 }

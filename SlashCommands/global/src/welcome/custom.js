@@ -1,5 +1,32 @@
 const {SelectMenuBuilder, ActionRowBuilder} = require("discord.js");
 
+const selectChannelId = async (client, interaction, channels) => {
+    let actionRow = new ActionRowBuilder()
+        .addComponents(
+
+            new SelectMenuBuilder()
+                .setCustomId("channel_id")
+                .setPlaceholder("Select channel to send.")
+                .addOptions(
+                    ...channels,
+                    {
+                        label: "None of the above",
+                        description: "I will select the channel manually.",
+                        value: "manually"
+                    }
+                )
+
+        )
+
+    let setupMsg = "Hello, Let's setup your welcome message on this server!" +
+        "\nAs I can only show you the 25 first channel, you may want to select the \"None of the above\" option if you want to select the channel manually.";
+
+    await interaction.reply({ content: setupMsg, components: [actionRow] })
+        .catch(async () => {
+            await interaction.editReply({ content: setupMsg, components: [actionRow] })
+        });
+}
+
 const customThemeWelcome = async (client, interaction) => {
 
     let actionRow = new ActionRowBuilder()
@@ -27,7 +54,10 @@ const customThemeWelcome = async (client, interaction) => {
             )
     )
     //await interaction.editReply({ content: "You may want to customize your welcome message :)." });
-    await interaction.editReply({ content: "You may want to customize your welcome message :).", components: [actionRow] });
+    await interaction.editReply({ content: "You may want to customize your welcome message :).", components: [actionRow] })
+        .catch(async () => {
+          await interaction.update({ content: "You may want to customize your welcome message :).", components: [actionRow] });
+        })
 
 
 
@@ -69,12 +99,16 @@ const customColorWelcome = async (client, interaction) => {
                 )
         )
     //await interaction.editReply({ content: "Choose your color." });
-    await interaction.editReply({ content: "Choose your color.", components: [colorRow] });
+    await interaction.editReply({ content: "Choose your color.", components: [colorRow] })
+        .catch(async () => {
+          await interaction.update({ content: "Choose your color.", components: [colorRow] });
+        })
 }
 
 
 module.exports = {
 
+    selectChannelId,
     customThemeWelcome,
     customColorWelcome
 

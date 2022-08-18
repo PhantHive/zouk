@@ -1,5 +1,5 @@
-const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
-const { customThemeWelcome, customColorWelcome} = require("../../SlashCommands/global/src/welcome/custom");
+const { MessageEmbed, MessageActionRow, MessageButton, ChannelType} = require("discord.js");
+const { customThemeWelcome, customColorWelcome, selectChannelId} = require("../../SlashCommands/global/src/welcome/custom");
 const wait = require('node:timers/promises').setTimeout;
 const WDB = require("../../utils/models/Welcomes.js");
 const themes = require("../../assets/json/theme.json");
@@ -81,30 +81,45 @@ const startSetup = async (client, interaction, data) => {
 
 }
 
-module.exports = async (client, interaction) => {
+const chooseConfig = async (client, interaction, choice, isEdit) => {
+    // 1 => channel id
+    // 2 => theme
+    // 3 => color
+    WDB.findOne({
+            server_id: interaction.guild.id
+        },
+        async (err, data) => {
+            if (err) {
+                await interaction.update({ content: "Sorry, A problem occured with the database. Please try again later.", components: [] });
+                return console.log(err);
+            }
 
+            if (isEdit) {
+                if (choice === 1) {
+                    let channels = interaction.guild.channels.cache.filter(c => c.type === ChannelType.GuildText).map(c => {
+                        return {
+                            label: `${c.name}`,
+                            value: `${c.id}`
+                        }
+                    });
 
-    if (interaction.isCommand()) {
-
-        let SlashCmds = client.SlashCmds.get(interaction.commandName);
-        if (SlashCmds) return SlashCmds.run(client, interaction)
-
-    }
-
-    if (interaction.isSelectMenu()) {
-
-        // welcome message
-        if (interaction.customId === "channel_id") {
-
-            WDB.findOne({
-                    server_id: interaction.guild.id
-                },
-                async (err, data) => {
-                    if (err) {
-                        await interaction.update({ content: "Sorry, A problem occured with the database. Please try again later." });
-                        return console.log(err);
+                    if (channels.length > 25) {
+                        channels.splice(24, channels.length - 23)
                     }
 
+                    data.channel_id = "0";
+                    data.save();
+                    await selectChannelId(client, interaction, channels);
+                }
+                else if (choice === 2) {
+                    await customThemeWelcome(client, interaction);
+                }
+                else if (choice === 3) {
+                    await customColorWelcome(client, interaction);
+                }
+            }
+            else {
+                if (choice === 1) {
                     if (!data) {
                         await new WDB({
                             server_id: `${interaction.guild.id}`,
@@ -129,7 +144,7 @@ module.exports = async (client, interaction) => {
 
                     }
                     else if (data.channel_id !== "0") {
-                        await interaction.update({ content: "The channel id has already been set. If you want to change it use /editwelcome." +
+                        await interaction.update({ content: "The channel id has already been set. If you want to change it use `welcome edit`." +
                                 "\nGoing to the next step."});
                         await wait(2500);
                         await customThemeWelcome(client, interaction);
@@ -137,75 +152,86 @@ module.exports = async (client, interaction) => {
                     else {
                         await startSetup(client, interaction, data);
                     }
-
                 }
-            )
-
-
-        }
-
-        if (interaction.customId === "theme") {
-            //await interaction.editReply({ content: `You have choosen ${interaction.values[0]} as your welcome message theme.` });
-            WDB.findOne({
-                    server_id: interaction.guild.id
-                },
-                async (err, data) => {
-                    if (err) {
-                        await interaction.update({ content: "Sorry, A problem occured with the database. Please try again later." });
-                        return console.log(err);
-                    }
-
+                else {
                     if (!data) {
-                        await interaction.update({ content: "Sorry, A problem occured with the database. Please try again later." });
+                        await interaction.update({ content: "Sorry, A problem occured with the database. Please try again later.", components: [] });
                     }
-                    else {
-
-                        if (data.theme !== -1) {
-                            await interaction.update({ content: "The theme has already been set. If you want to change it use /editwelcome." +
-                                    "\nGoing to the next step."});
+                    if (choice === 2) {
+                        if (data.theme !== -1 && !data.isEdit) {
+                            await interaction.update({ content: "The theme has already been set. If you want to change it use `welcome edit`." +
+                                    "\nGoing to the next step.", components: []});
                             await wait(2500);
                             await customNextStep(client, interaction, data); // checking where to go next
                         }
-                        data.theme = parseInt(interaction.values[0]);
-                        await data.save();
-                        await interaction.update({ content: `You have choosen ${themes[parseInt(interaction.values[0])]["name"]} as your welcome message theme.`, components: [] });
-                        await wait(2000);
-                        await customNextStep(client, interaction, data); // checking where to go next
-                    }
-                }
-            )
+                        else {
+                            data.theme = parseInt(interaction.values[0]);
+                            data.isEdit = false;
+                            await data.save();
+                            await interaction.update({ content: `You have choosen ${themes[parseInt(interaction.values[0])]["name"]} as your welcome message theme.`, components: [] });
+                            await wait(2000);
+                            await customNextStep(client, interaction, data); // checking where to go next
+                        }
 
-        }
-        if (interaction.customId === "color") {
-            WDB.findOne({
-                    server_id: interaction.guild.id
-                },
-                async (err, data) => {
-                    if (err) {
-                        await interaction.update({ content: "Sorry, A problem occured with the database. Please try again later." });
-                        return console.log(err);
-                    }
-
-                    if (!data) {
-                        await interaction.update({ content: "Sorry, A problem occured with the database. Please try again later." });
                     }
                     else {
-
-                        if (data.color !== "#000000") {
-                            await interaction.update({ content: "Seems like everything have already been set. If you want to change it use /editwelcome." });
+                        if (data.color !== "#000000" && !data.isEdit) {
+                            await interaction.update({ content: "Seems like everything have already been set. If you want to change it use `welcome edit`.", components: [] });
                             await wait(2500);
                             await customColorWelcome(client, interaction);
                         }
-                        data.color = interaction.values[0];
-                        await data.save();
-                        await interaction.update({ content: `Your welcome message is fully setup! Congrats my boy.` +
-                                `\n**Channel**: <#${data.channel_id}>\n**Theme**: ${themes[data.theme]["name"]}\n**Color**: ${data.color}`, components: [] });
-                        
+                        else {
+                            data.color = interaction.values[0];
+                            data.isEdit = false;
+                            await data.save();
+                            await interaction.update({ content: `Your welcome message is fully setup! Congrats my boy.` +
+                                    `\n**Channel**: <#${data.channel_id}>\n**Theme**: ${themes[data.theme]["name"]}\n**Color**: ${data.color}`, components: [] });
+                        }
+
                     }
                 }
-            )
-            //await interaction.editReply({ content: "Your welcome message is fully setup! Congrats my boy" });
+            }
+        }
+    )
+}
 
+module.exports = async (client, interaction) => {
+
+
+    if (interaction.isCommand()) {
+
+        let SlashCmds = client.SlashCmds.get(interaction.commandName);
+        if (SlashCmds) return SlashCmds.run(client, interaction)
+
+    }
+
+    if (interaction.isSelectMenu()) {
+
+        // welcome message edit
+        if (interaction.customId === "edit_welcome") {
+            if (interaction.values[0] === "edit_channel_id") {
+                await chooseConfig(client, interaction, 1, true);
+            }
+            else if (interaction.values[0] === "edit_theme") {
+                await chooseConfig(client, interaction, 2, true);
+            }
+            else if (interaction.values[0] === "edit_color") {
+                await chooseConfig(client, interaction, 3, true);
+            }
+        }
+
+        // welcome message
+
+        if (interaction.customId === "channel_id") {
+            await chooseConfig(client, interaction, 1, false);
+        }
+        if (interaction.customId === "theme") {
+            //await interaction.editReply({ content: `You have choosen ${interaction.values[0]} as your welcome message theme.` });
+           await chooseConfig(client, interaction, 2, false);
+        }
+        if (interaction.customId === "color") {
+            await chooseConfig(client, interaction, 3, false);
+            //await interaction.editReply({ content: "Your welcome message is fully setup! Congrats my boy" });
         }
 
     }

@@ -16,6 +16,18 @@
     "value": 3,
     "emoji": "1008063338355359834",
     "name": "landscapes"
+  },
+
+  {
+    "value": 4,
+    "emoji": "864986373714214972",
+    "name": "system"
+  },
+
+  {
+    "value": 5,
+    "emoji": "879146014232170506",
+    "name": "phearion"
   }
 
 ]

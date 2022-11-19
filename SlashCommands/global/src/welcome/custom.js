@@ -50,6 +50,16 @@ const customThemeWelcome = async (client, interaction) => {
                     label: "Landscapes",
                     emoji: "1008063338355359834",
                     value: "2",
+                },
+                {
+                    label: "System",
+                    emoji: "864986373714214972",
+                    value: "3"
+                },
+                {
+                    label: "Phearion",
+                    emoji: "879146014232170506",
+                    value: "4"
                 }
             )
     )

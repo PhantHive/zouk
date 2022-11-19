@@ -24,6 +24,7 @@ const applyText = (canvas, text) => {
 
 module.exports = async (client, member) => {
 
+
         WDB.findOne({
             server_id: member.guild.id
         },
@@ -54,25 +55,7 @@ module.exports = async (client, member) => {
                     console.log("iris member joined.")
                 } else if (member.guild.id === "809190693196529704") {
                     console.log("System member joined.")
-                } else {
-                    if ((member.guild.id === '608155753748103170') || (member.guild.id === '755084203779162151')) {
-                        try {
-                            const incruste = member.guild.roles.cache.find(role => role.name === "incruste"); //
-                            member.roles.add(incruste);
-                        } catch (err) {
-                            //do nothing
-                        }
-                    } else if ((member.guild.id === '880499115878932571')) {
-                        try {
-                            const incruste = member.guild.roles.cache.find(role => role.name === "Incruste"); //
-                            member.roles.add(incruste);
-                        } catch (err) {
-                            //do nothing
-                        }
-                    }
-
                 }
-
 
                 ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
@@ -135,6 +118,10 @@ module.exports = async (client, member) => {
 
                     .then(channel => {
                         channel.send({ files: [attachment] }).then(r => {
+
+                            // if user is bot we don't want to send him the message
+                            if (member.user.bot) return;
+
                             let rulesChannel = member.guild.channels.cache.find(ch => ch.name.includes('règlement') || ch.name.includes('règles'));
                             let globalMsg;
 

@@ -1,0 +1,31 @@
+{
+  "name": "rules",
+  "description": "Setup your rules reaction system",
+  "default_permission" : false,
+  "options": [
+    {
+      "name": "config",
+      "description": "Configure the rules system",
+      "type": 3,
+      "choices": [
+        {
+          "name": "setup",
+          "description": "Setup the rules system",
+          "value": "setup_rules"
+        },
+        {
+          "name": "edit",
+          "description": "Edit the rules system",
+          "value": "edit_rules"
+        },
+        {
+          "name": "reset",
+          "description": "Reset the rules system",
+          "value": "reset_rules"
+        }
+
+      ],
+      "required": true
+    }
+  ]
+}

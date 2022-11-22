@@ -2,13 +2,15 @@ const { MessageEmbed, MessageActionRow, MessageButton, ChannelType} = require("d
 const { customThemeWelcome, customColorWelcome, selectChannelId} = require("../../SlashCommands/global/src/welcome/custom");
 const wait = require('node:timers/promises').setTimeout;
 const WDB = require("../../utils/models/Welcomes.js");
+const RDB = require("../../utils/models/Rules.js");
 const themes = require("../../assets/json/theme.json");
+const {selectMessageRulesId} = require("../../SlashCommands/global/src/rules/custom");
 
-const isChannelValid = async (channel) => new Promise((resolve, reject) => {
+const isChannelValid = async (channel, configName) => new Promise((resolve, reject) => {
 
     const id = Number(channel);
     if (Number.isInteger(id) && id !== 0 ) {
-        resolve("Thank you! I will send welcome message in this channel.");
+        resolve(`Thank you! I will send ${configName} message in this channel.`);
     }
     else {
         reject("Sorry, I can't send welcome message in this channel. It is probably not a valid channel.");
@@ -30,7 +32,8 @@ const customNextStep = async (client, interaction, data) => {
     }
 }
 
-const startSetup = async (client, interaction, data) => {
+// start setup for Welcome and Rules
+const startWelcomeSetup = async (client, interaction, data) => {
 
     if (interaction.values[0] === "manually") {
         await interaction.update({ content: "Please write the channel you want me to send welcome message in. (Either you can tag the channel #channel or give me the ID)", components: [] })
@@ -46,7 +49,7 @@ const startSetup = async (client, interaction, data) => {
             else {
                 channel = msg.content;
             }
-            await isChannelValid(channel)
+            await isChannelValid(channel, "welcome")
                 .then(async res => {
                     await interaction.editReply({ content: res });
                     collector.stop();
@@ -62,7 +65,7 @@ const startSetup = async (client, interaction, data) => {
         })
     }
     else {
-        await isChannelValid(interaction.values[0])
+        await isChannelValid(interaction.values[0], "welcome")
             .then(async res => {
                 await interaction.editReply({ content: res, components: [] })
                     .catch(async () => {
@@ -81,7 +84,58 @@ const startSetup = async (client, interaction, data) => {
 
 }
 
-const chooseConfig = async (client, interaction, choice, isEdit) => {
+const startRulesSetup = async (client, interaction, data) => {
+
+    if (interaction.values[0] === "manually") {
+        await interaction.update({ content: "Please write the channel you want me to send rules message in. (Either you can tag the channel #channel or give me the ID)", components: [] })
+
+        const filter = i => i.author.id === interaction.author.id;
+        const collector = interaction.channel.createMessageCollector(filter, { time: 30000 });
+
+        collector.on("collect", async msg => {
+            let channel;
+            if (msg.content.startsWith("<#")) {
+                channel = msg.content.match(/\d+/g)
+            }
+            else {
+                channel = msg.content;
+            }
+            await isChannelValid(channel, "rules")
+                .then(async res => {
+                    await interaction.editReply({ content: res });
+                    collector.stop();
+                    data.channel_id = `${channel}`;
+                    data.save();
+                    await msg.delete({ timeout: 15000 });
+                    await wait(1000);
+                    await selectMessageRulesId(client, interaction);
+
+                })
+                .catch(err => console.log(err));
+
+        })
+    }
+    else {
+        await isChannelValid(interaction.values[0], "rules")
+            .then(async res => {
+                await interaction.editReply({ content: res, components: [] })
+                    .catch(async () => {
+                        await interaction.update({ content: res, components: [] })
+                    })
+                data.channel_id = `${interaction.values[0]}`;
+                data.save();
+                await wait(2000);
+                await selectMessageRulesId(client, interaction);
+
+            })
+            .catch(err => console.log(err));
+
+    }
+    data.save();
+
+}
+
+const chooseConfigWelcome = async (client, interaction, choice, isEdit) => {
     // 1 => channel id
     // 2 => theme
     // 3 => color
@@ -138,7 +192,7 @@ const chooseConfig = async (client, interaction, choice, isEdit) => {
                                 }
                                 await interaction.update({ content: "Wait a sec please...", components: [] });
                                 await wait(1000);
-                                await startSetup(client, interaction, data);
+                                await startWelcomeSetup(client, interaction, data);
                             }
                         )
 
@@ -150,7 +204,7 @@ const chooseConfig = async (client, interaction, choice, isEdit) => {
                         await customThemeWelcome(client, interaction);
                     }
                     else {
-                        await startSetup(client, interaction, data);
+                        await startWelcomeSetup(client, interaction, data);
                     }
                 }
                 else {
@@ -195,6 +249,85 @@ const chooseConfig = async (client, interaction, choice, isEdit) => {
     )
 }
 
+const chooseConfigRules = async (client, interaction, choice, isEdit) => {
+
+
+    RDB.findOne({
+        server_id: interaction.guild.id
+    }
+    , async (err, data) => {
+
+        if (isEdit) {
+
+            if (choice === 1) {
+                let channels = interaction.guild.channels.cache.filter(c => c.type === ChannelType.GuildText).map(c => {
+                    return {
+                        label: `${c.name}`,
+                        value: `${c.id}`
+                    }
+                });
+
+                if (channels.length > 25) {
+                    channels.splice(24, channels.length - 23)
+                }
+
+                data.channel_id = "0";
+                data.save();
+                await selectChannelId(client, interaction, channels);
+            }
+            else if (choice === 2) {
+                await selectMessageRulesId(client, interaction);
+            }
+
+        }
+        else {
+
+            if (!data) {
+                await new RDB({
+                    server_id: `${interaction.guild.id}`,
+                    channel_id: "0",
+                    message_id: "0"
+                }).save();
+
+                RDB.findOne({
+                    server_id: interaction.guild.id
+                }, async (err, data) => {
+                    if (err) {
+                        await interaction.update({ content: "Sorry, A problem occured with the database. Please try again later." });
+                        return console.log(err);
+                    }
+                    await interaction.update({ content: "Wait a sec please...", components: [] });
+                    await wait(1000);
+                    await startRulesSetup(client, interaction, data, 1, false);
+                })
+            }
+            else {
+
+                if (data.channel_id !== "0" && data.message_id === "0") {
+                    await interaction.update({
+                        content: "The channel id has already been set. If you want to change it use `rules edit`." +
+                            "\nGoing to the next step.", components: []
+                    });
+                    await wait(2500);
+                    await selectMessageRulesId(client, interaction);
+                }
+                else if (data.message_id !== "0") {
+                    await interaction.update({
+                        content: "The message id has already been set. If you want to change it use `rules edit`.",
+                        components: []
+                    });
+                    await wait(2500);
+                }
+                else {
+                    await startRulesSetup(client, interaction, data, 1, false);
+                }
+            }
+
+        }
+
+    })
+}
+
 module.exports = async (client, interaction) => {
 
 
@@ -207,32 +340,59 @@ module.exports = async (client, interaction) => {
 
     if (interaction.isSelectMenu()) {
 
+        // ================
+        // WELCOME SYSTEM
+        // ================
+
         // welcome message edit
         if (interaction.customId === "edit_welcome") {
             if (interaction.values[0] === "edit_channel_id") {
-                await chooseConfig(client, interaction, 1, true);
+                await chooseConfigWelcome(client, interaction, 1, true);
             }
             else if (interaction.values[0] === "edit_theme") {
-                await chooseConfig(client, interaction, 2, true);
+                await chooseConfigWelcome(client, interaction, 2, true);
             }
             else if (interaction.values[0] === "edit_color") {
-                await chooseConfig(client, interaction, 3, true);
+                await chooseConfigWelcome(client, interaction, 3, true);
             }
         }
 
         // welcome message
 
         if (interaction.customId === "channel_id") {
-            await chooseConfig(client, interaction, 1, false);
+            await chooseConfigWelcome(client, interaction, 1, false);
         }
         if (interaction.customId === "theme") {
             //await interaction.editReply({ content: `You have choosen ${interaction.values[0]} as your welcome message theme.` });
-           await chooseConfig(client, interaction, 2, false);
+           await chooseConfigWelcome(client, interaction, 2, false);
         }
         if (interaction.customId === "color") {
-            await chooseConfig(client, interaction, 3, false);
+            await chooseConfigWelcome(client, interaction, 3, false);
             //await interaction.editReply({ content: "Your welcome message is fully setup! Congrats my boy" });
         }
+
+
+        // ================
+        // RULES SYSTEM
+        // ================
+
+        // rules message edit
+        if (interaction.customId === "edit_rules") {
+            if (interaction.values[0] === "edit_channel_id") {
+                await chooseConfigRules(client, interaction, 1, true);
+            }
+            else if (interaction.values[0] === "edit_message_id") {
+                await chooseConfigRules(client, interaction, 2, true);
+            }
+        }
+
+        if (interaction.customId === "rules_channel_id") {
+            await chooseConfigRules(client, interaction, 1, false);
+        }
+        if (interaction.customId === "rules_message_id") {
+            await chooseConfigRules(client, interaction, 2, false);
+        }
+
 
     }
 

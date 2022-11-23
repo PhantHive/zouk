@@ -4,7 +4,9 @@ const guildSchema = mongoose.Schema({
 
     server_id: String,
     channel_id: String,
-    message_id: String, //image category
+    message_id: String,
+    role_id: String,
+    isEdit: Boolean
 
 });
 

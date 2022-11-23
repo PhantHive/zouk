@@ -1,6 +1,6 @@
 const {ActionRowBuilder, SelectMenuBuilder, ChannelType} = require("discord.js");
 // custom
-const { selectMessageRulesId, selectRulesChannelId} = require("./src/rules/custom");
+const { selectMessageRulesId, selectRulesChannelId, selectRulesRoleId} = require("./src/rules/custom");
 const RDB = require("../../utils/models/Rules");
 const {editOptions} = require("./src/rules/edit");
 const wait = require('node:timers/promises').setTimeout;
@@ -31,8 +31,20 @@ module.exports = {
                     }
                 });
 
+                let roles = interaction.guild.roles.cache.map(r => {
+                    return {
+                        label: `${r.name}`,
+                        value: `${r.id}`
+                    }
+                });
+
+
                 if (channels.length > 25) {
                     channels.splice(24, channels.length - 23)
+                }
+
+                if (roles.length > 25) {
+                    roles.splice(24, roles.length - 23)
                 }
 
                 if (choice === "reset_rules" && !data) {
@@ -56,7 +68,7 @@ module.exports = {
                         await selectRulesChannelId(client, interaction, channels);
 
                     }
-                    else if (data.channel_id !== "0" && data.message_id !== "0") {
+                    else if (data.channel_id !== "0" && data.message_id !== "0" && data.role_id !== "0") {
                         await interaction.reply({ content: "Everything has been set already! If you want to change anything use `rules edit`" });
                     }
                     else {
@@ -68,6 +80,9 @@ module.exports = {
                         }
                         else if (data.message_id === "0") {
                             await selectMessageRulesId(client, interaction, data.channel_id);
+                        }
+                        else if (data.role_id === "0") {
+                            await selectRulesRoleId(client, interaction, roles);
                         }
 
                     }

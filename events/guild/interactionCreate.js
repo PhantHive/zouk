@@ -4,7 +4,7 @@ const wait = require('node:timers/promises').setTimeout;
 const WDB = require("../../utils/models/Welcomes.js");
 const RDB = require("../../utils/models/Rules.js");
 const themes = require("../../assets/json/theme.json");
-const { selectMessageRulesId, selectRulesChannelId } = require("../../SlashCommands/global/src/rules/custom");
+const { selectMessageRulesId, selectRulesChannelId, selectRulesRoleId} = require("../../SlashCommands/global/src/rules/custom");
 
 const isChannelValid = async (channel, configName) => new Promise((resolve, reject) => {
 
@@ -103,6 +103,9 @@ const startRulesSetup = async (client, interaction, data) => {
 
     if (interaction.values[0] === "manually") {
         await interaction.update({ content: "Please write the channel you want me to send rules message in. (Either you can tag the channel #channel or give me the ID)", components: [] })
+            .catch(async () => {
+                await interaction.editReply({ content: "Please write the channel you want me to send rules message in. (Either you can tag the channel #channel or give me the ID)", components: [] })
+            })
 
         const filter = i => i.author.id === interaction.author.id;
         const collector = interaction.channel.createMessageCollector(filter, { time: 30000 });
@@ -147,6 +150,77 @@ const startRulesSetup = async (client, interaction, data) => {
 
     }
     data.save();
+    await chooseConfigWelcome(client, interaction, data);
+
+}
+
+const isRoleValid = async (client, interaction, role_id) => new Promise((resolve, reject) => {
+
+    // check if role is valid and in the guild where the interaction was sent;
+    const roleObj = client.guilds.cache.get(interaction.guild.id).roles.cache.get(role_id);
+    if (roleObj) {
+        resolve(`Thank you! I will give this role to new members.`);
+    }
+    else {
+        reject("Sorry, I can't give this role to new members. It is probably not a valid role or the role is above mines. Check the hierarchy of the roles.");
+    }
+})
+
+const chooseRulesRole = async (client, interaction, data) => {
+
+    if (interaction.values[0] === "manually") {
+        await interaction.update({ content: "Please write the role you want me to give to people who accept rules. (Either you can tag the role @role or give me the ID)",
+            components: [] })
+            .catch(async () => {
+                await interaction.editReply({ content: "Please write the role you want me to give to people who accept rules. (Either you can tag the role @role or give me the ID)",
+                    components: [] })
+            })
+
+        const filter = i => i.author.id === interaction.author.id;
+        const collector = interaction.channel.createMessageCollector(filter, { time: 30000 });
+
+        collector.on("collect", async msg => {
+            let role;
+            if (msg.content.startsWith("<@&")) {
+                role = msg.content.match(/\d+/g)
+            }
+            else {
+                role = msg.content;
+            }
+            await isRoleValid(client, interaction, role[0])
+                .then(async res => {
+                    await interaction.editReply({ content: res });
+                    collector.stop();
+                    data.role_id = `${role}`;
+                    data.save();
+                    await msg.delete({ timeout: 15000 });
+                    await wait(1000);
+                    await interaction.editReply({ content: `Your rules message is fully setup! Congrats
+                    \n**Channel**: <#${data.channel_id}>\n**Message ID**: ${data.message_id}\n**Role**: <@&${data.role_id}>`, components: [] })
+
+
+                })
+                .catch(err => console.log(err));
+
+        })
+
+
+
+    }
+    else {
+        await isRoleValid(client, interaction, interaction.values[0])
+            .then(async res => {
+                await interaction.editReply({ content: res, components: [] })
+                data.role_id = `${interaction.values[0]}`;
+                data.save();
+                await wait(2000);
+                await interaction.editReply({ content: `Your rules message is fully setup! Congrats
+                \n**Channel**: <#${data.channel_id}>\n**Message ID**: ${data.message_id}\n**Role**: <@&${data.role_id}>`, components: [] })
+
+
+            })
+            .catch(err => console.log(err));
+    }
 
 }
 
@@ -266,6 +340,16 @@ const chooseConfigWelcome = async (client, interaction, choice, isEdit) => {
 
 const chooseConfigRules = async (client, interaction, choice, isEdit) => {
 
+    let roles = interaction.guild.roles.cache.map(r => {
+        return {
+            label: `${r.name}`,
+            value: `${r.id}`
+        }
+    });
+
+    if (roles.length > 25) {
+        roles.splice(24, roles.length - 23)
+    }
 
     RDB.findOne({
         server_id: interaction.guild.id
@@ -302,6 +386,11 @@ const chooseConfigRules = async (client, interaction, choice, isEdit) => {
 
                 await selectMessageRulesId(client, interaction, data.channel_id);
             }
+            else if (choice === 3) {
+
+                // rules Role
+                await selectRulesRoleId(client, interaction, roles)
+            }
 
         }
         else {
@@ -310,7 +399,8 @@ const chooseConfigRules = async (client, interaction, choice, isEdit) => {
                 await new RDB({
                     server_id: `${interaction.guild.id}`,
                     channel_id: "0",
-                    message_id: "0"
+                    message_id: "0",
+                    role_id: "0"
                 }).save();
 
                 RDB.findOne({
@@ -335,14 +425,20 @@ const chooseConfigRules = async (client, interaction, choice, isEdit) => {
                     });
                     await wait(2500);
                     await selectMessageRulesId(client, interaction);
+                    await startRulesSetup(client, interaction, data, 3, false);
                 }
-                else if (data.message_id !== "0") {
+                else if (data.message_id !== "0" && data.role_id === "0") {
 
                     await interaction.update({
-                        content: "The message id has already been set. If you want to change it use `rules edit`.",
-                        components: []
+                        content: "The message id has already been set. If you want to change it use `rules edit`." +
+                            "\nGoing to the next step.", components: []
                     });
                     await wait(2500);
+                    await chooseRulesRole(client, interaction, data)
+                }
+                else if (data.role_id !== "0") {
+                    await interaction.update({ content: `Seems like everything have already been set. If you want to change it use \`rules edit\`.
+                            \n**Channel**: <#${data.channel_id}>\n**Message ID**: ${data.message_id}\n**Role**: <@&${data.role_id}>`, components: [] });
                 }
                 else {
                     await startRulesSetup(client, interaction, data, 1, false);
@@ -410,6 +506,9 @@ module.exports = async (client, interaction) => {
             else if (interaction.values[0] === "edit_message_id") {
                 await chooseConfigRules(client, interaction, 2, true);
             }
+            else if (interaction.values[0] === "edit_role_id") {
+                await chooseConfigRules(client, interaction, 3, true);
+            }
         }
 
         if (interaction.customId === "rules_channel_id") {
@@ -417,6 +516,9 @@ module.exports = async (client, interaction) => {
         }
         if (interaction.customId === "rules_message_id") {
             await chooseConfigRules(client, interaction, 2, false);
+        }
+        if (interaction.customId === "rules_role_id") {
+            await chooseConfigRules(client, interaction, 3, false);
         }
 
 

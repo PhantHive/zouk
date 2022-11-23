@@ -81,8 +81,7 @@ const selectMessageRulesId = async (client, interaction, channelId) => {
                 )
                 // react to message with :white_check_mark:
                 await message.react("✅");
-                await interaction.editReply({ content: `Rules message ID has been set with the following configuration:` +
-                        `\n**Channel ID**: ${channelId} \n **Message ID**: ${messageId}` })
+                await interaction.editReply({ content: `Message ID ${m.content} is now set as Rules message. \nGoing to last step.` })
                 collector.stop();
             }
         }
@@ -90,9 +89,38 @@ const selectMessageRulesId = async (client, interaction, channelId) => {
 
 }
 
+const selectRulesRoleId = async (client, interaction, roles) => {
+
+    let actionRow = new ActionRowBuilder()
+        .addComponents(
+
+            new SelectMenuBuilder()
+                .setCustomId("rules_role_id")
+                .setPlaceholder("Select role to give.")
+                .addOptions(
+                    ...roles,
+                    {
+                        label: "None of the above",
+                        description: "I will select the role manually.",
+                        value: "manually"
+                    }
+                )
+
+        )
+
+    let setupMsg = "Hello, Let's setup your rules message on this server!" +
+        "\nAs I can only show you the 25 first role, you may want to select the \"None of the above\" option if you want to select the role manually.";
+
+    await interaction.reply({ content: setupMsg, components: [actionRow] })
+        .catch(async () => {
+            await interaction.editReply({ content: setupMsg, components: [actionRow] })
+        });
+}
+
 module.exports = {
 
     selectRulesChannelId,
-    selectMessageRulesId
+    selectMessageRulesId,
+    selectRulesRoleId
 
 }

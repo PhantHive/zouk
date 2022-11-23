@@ -18,6 +18,11 @@ const editOptions = async (interaction) => {
                         label: "Edit message id",
                         emoji: "🗨️",
                         value: "edit_message_id",
+                    },
+                    {
+                        label: "Edit role id",
+                        emoji: "👮",
+                        value: "edit_role_id",
                     }
                 )
         )

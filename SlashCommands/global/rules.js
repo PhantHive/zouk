@@ -40,7 +40,7 @@ module.exports = {
                 }
                 else if (choice === "reset_rules" && data) {
                     await data.remove();
-                    return interaction.reply("rules message has been reset.")
+                    return interaction.reply("Rules message has been reset.")
                 }
                 else if (choice === "edit_rules" && !data) {
                     return interaction.reply("There is no rules message set up on this server. Use `rules setup` to set up a rules message.")

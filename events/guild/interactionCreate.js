@@ -4,7 +4,7 @@ const wait = require('node:timers/promises').setTimeout;
 const WDB = require("../../utils/models/Welcomes.js");
 const RDB = require("../../utils/models/Rules.js");
 const themes = require("../../assets/json/theme.json");
-const {selectMessageRulesId} = require("../../SlashCommands/global/src/rules/custom");
+const { selectMessageRulesId, selectRulesChannelId } = require("../../SlashCommands/global/src/rules/custom");
 
 const isChannelValid = async (channel, configName) => new Promise((resolve, reject) => {
 
@@ -30,6 +30,14 @@ const customNextStep = async (client, interaction, data) => {
     else {
         await customColorWelcome(client, interaction);
     }
+}
+
+const removeReactionOnMessageId = async (client, interaction, data) => {
+
+        const message = await client.channels.cache.get(data.channel_id).messages.fetch(data.message_id);
+        // remove reaction :white_check_mark: from the message
+        await message.reactions.cache.get("✅").users.remove(client.user.id);
+
 }
 
 // start setup for Welcome and Rules
@@ -86,6 +94,13 @@ const startWelcomeSetup = async (client, interaction, data) => {
 
 const startRulesSetup = async (client, interaction, data) => {
 
+
+    // if channel is edited and the channel is not the same as the one in the database then we need to reset the message id
+    if (data.channel_id !== interaction.values[0]) {
+        data.message_id = "0";
+        data.save();
+    }
+
     if (interaction.values[0] === "manually") {
         await interaction.update({ content: "Please write the channel you want me to send rules message in. (Either you can tag the channel #channel or give me the ID)", components: [] })
 
@@ -108,7 +123,7 @@ const startRulesSetup = async (client, interaction, data) => {
                     data.save();
                     await msg.delete({ timeout: 15000 });
                     await wait(1000);
-                    await selectMessageRulesId(client, interaction);
+                    await selectMessageRulesId(client, interaction, data.channel_id);
 
                 })
                 .catch(err => console.log(err));
@@ -125,7 +140,7 @@ const startRulesSetup = async (client, interaction, data) => {
                 data.channel_id = `${interaction.values[0]}`;
                 data.save();
                 await wait(2000);
-                await selectMessageRulesId(client, interaction);
+                await selectMessageRulesId(client, interaction, data.channel_id);
 
             })
             .catch(err => console.log(err));
@@ -260,6 +275,7 @@ const chooseConfigRules = async (client, interaction, choice, isEdit) => {
         if (isEdit) {
 
             if (choice === 1) {
+
                 let channels = interaction.guild.channels.cache.filter(c => c.type === ChannelType.GuildText).map(c => {
                     return {
                         label: `${c.name}`,
@@ -271,12 +287,20 @@ const chooseConfigRules = async (client, interaction, choice, isEdit) => {
                     channels.splice(24, channels.length - 23)
                 }
 
+                // remove old reaction on message id
+                await removeReactionOnMessageId(client, interaction, data);
+
                 data.channel_id = "0";
+                data.message_id = "0";
                 data.save();
-                await selectChannelId(client, interaction, channels);
+                await selectRulesChannelId(client, interaction, channels);
             }
             else if (choice === 2) {
-                await selectMessageRulesId(client, interaction);
+
+                // remove old reaction on message id
+                await removeReactionOnMessageId(client, interaction, data);
+
+                await selectMessageRulesId(client, interaction, data.channel_id);
             }
 
         }
@@ -303,6 +327,7 @@ const chooseConfigRules = async (client, interaction, choice, isEdit) => {
             }
             else {
 
+
                 if (data.channel_id !== "0" && data.message_id === "0") {
                     await interaction.update({
                         content: "The channel id has already been set. If you want to change it use `rules edit`." +
@@ -312,6 +337,7 @@ const chooseConfigRules = async (client, interaction, choice, isEdit) => {
                     await selectMessageRulesId(client, interaction);
                 }
                 else if (data.message_id !== "0") {
+
                     await interaction.update({
                         content: "The message id has already been set. If you want to change it use `rules edit`.",
                         components: []

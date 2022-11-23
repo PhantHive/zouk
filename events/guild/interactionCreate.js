@@ -32,13 +32,20 @@ const customNextStep = async (client, interaction, data) => {
     }
 }
 
-const removeReactionOnMessageId = async (client, interaction, data) => {
+const removeReactionOnMessageId = async (client, interaction, data) => new Promise(async (resolve, reject) => {
 
-        const message = await client.channels.cache.get(data.channel_id).messages.fetch(data.message_id);
-        // remove reaction :white_check_mark: from the message
+    const message = await client.channels.cache.get(data.channel_id).messages.fetch(data.message_id);
+    // remove reaction :white_check_mark: from the message
+    try {
         await message.reactions.cache.get("✅").users.remove(client.user.id);
+        resolve("Reaction removed from the message.");
+    }
+    catch (err) {
+        reject("Can't remove reaction from the message.");
+    }
 
-}
+
+});
 
 // start setup for Welcome and Rules
 const startWelcomeSetup = async (client, interaction, data) => {
@@ -328,7 +335,11 @@ const chooseConfigWelcome = async (client, interaction, choice, isEdit) => {
                             data.isEdit = false;
                             await data.save();
                             await interaction.update({ content: `Your welcome message is fully setup! Congrats my boy.` +
-                                    `\n**Channel**: <#${data.channel_id}>\n**Theme**: ${themes[data.theme]["name"]}\n**Color**: ${data.color}`, components: [] });
+                                    `\n**Channel**: <#${data.channel_id}>\n**Theme**: ${themes[data.theme]["name"]}\n**Color**: ${data.color}`, components: [] })
+                                .catch(async () => {
+                                    await interaction.editReply({ content: `Your welcome message is fully setup! Congrats my boy.` +
+                                            `\n**Channel**: <#${data.channel_id}>\n**Theme**: ${themes[data.theme]["name"]}\n**Color**: ${data.color}`, components: [] });
+                                })
                         }
 
                     }
@@ -372,7 +383,8 @@ const chooseConfigRules = async (client, interaction, choice, isEdit) => {
                 }
 
                 // remove old reaction on message id
-                await removeReactionOnMessageId(client, interaction, data);
+                await removeReactionOnMessageId(client, interaction, data)
+                    .catch(res => console.log(res));
 
                 data.channel_id = "0";
                 data.message_id = "0";
@@ -382,7 +394,8 @@ const chooseConfigRules = async (client, interaction, choice, isEdit) => {
             else if (choice === 2) {
 
                 // remove old reaction on message id
-                await removeReactionOnMessageId(client, interaction, data);
+                await removeReactionOnMessageId(client, interaction, data)
+                    .catch(res => console.log(res));
 
                 await selectMessageRulesId(client, interaction, data.channel_id);
             }

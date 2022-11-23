@@ -6,9 +6,9 @@ table.setHeading("", "Slash Commands", "Loaded commands")
 
 // slash commands
 module.exports = (client) => {
+    let cnt = 1;
     readdirSync('./SlashCommands/').forEach(dir => {
         const slashCmds = readdirSync(`./SlashCommands/${dir}/`).filter(file => file.endsWith('.js'));
-        let cnt = 1;
 
         for (let file of slashCmds) {
             let spull = require(`../SlashCommands/${dir}/${file}`);

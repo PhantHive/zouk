@@ -1,7 +1,8 @@
-const { Client, IntentsBitField, Collection} = require('discord.js');
+const { Client, IntentsBitField, Collection, Partials} = require('discord.js');
 
 let myIntents = new IntentsBitField();
-myIntents.add( IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent,
+myIntents.add(IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent,
+    IntentsBitField.Flags.GuildMessageReactions, IntentsBitField.Flags.GuildIntegrations,
     IntentsBitField.Flags.GuildIntegrations, IntentsBitField.Flags.GuildVoiceStates,
     IntentsBitField.Flags.DirectMessages, IntentsBitField.Flags.DirectMessageTyping,
     IntentsBitField.Flags.GuildPresences, IntentsBitField.Flags.GuildMembers
@@ -10,8 +11,8 @@ myIntents.add( IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages
 require('dotenv').config();
 
 const client = new Client({
-    partials: ["CHANNEL"],
-    intents: myIntents
+    intents: myIntents,
+    partials: [Partials.Channel, Partials.User, Partials.GuildMember, Partials.Message, Partials.Reaction]
 });
 
 client.mongoose = require('./utils/mongose.js');

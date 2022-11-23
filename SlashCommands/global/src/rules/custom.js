@@ -28,9 +28,16 @@ const selectRulesChannelId = async (client, interaction, channels) => {
         });
 }
 
-const selectMessageRulesId = async (client, interaction, channelId) => {
+const selectMessageRulesId = async (client, interaction, channelId) => new Promise(async (resolve, reject) => {
 
-    const channel = await client.channels.fetch(channelId);
+    let channel;
+    try {
+         channel = await client.channels.fetch(channelId);
+    }
+    catch (e) {
+        return reject("Problem in configuration. Please try again later or /rules reset and setup again.")
+    }
+
 
     let selectMsg = "Please write the ID of the message you want me to set as Rules. If you don't know how to get the ID of a message, " +
         "please follow this guide: https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-";
@@ -44,20 +51,21 @@ const selectMessageRulesId = async (client, interaction, channelId) => {
 
     const collector = interaction.channel.createMessageCollector({ filter, time: 60000 });
 
-    collector.on('collect', async (m) => {
+    await collector.on('collect', async (m) => {
 
         if (m.content === "cancel") {
-            await interaction.editReply({ content: "Cancelled." })
+            reject("Cancelled.")
             collector.stop();
         }
         else if (m.content === "none") {
-            await interaction.editReply({ content: "No message will be edited." })
+            reject("No message will be edited." )
             collector.stop();
         }
         else {
             let message = await channel.messages.fetch(m.content)
                 .catch(async () => {
                     await interaction.editReply({ content: "The message ID you entered is invalid." })
+                    reject("The message ID you entered is invalid.");
                     collector.stop();
                 });
 
@@ -75,19 +83,19 @@ const selectMessageRulesId = async (client, interaction, channelId) => {
                             messageId = data.message_id;
                             data.save();
                         } else {
-                            await interaction.editReply({ content: "Rules system is not setup on this server. Use /setup" })
+                            reject("Rules system is not setup on this server. Use /setup" );
                         }
                     }
                 )
                 // react to message with :white_check_mark:
                 await message.react("✅");
-                await interaction.editReply({ content: `Message ID ${m.content} is now set as Rules message. \nGoing to last step.` })
+                resolve(`Message ID ${m.content} is now set as Rules message. \nGoing to last step.`);
                 collector.stop();
             }
         }
     });
 
-}
+});
 
 const selectRulesRoleId = async (client, interaction, roles) => {
 

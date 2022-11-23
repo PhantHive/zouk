@@ -31,12 +31,22 @@ module.exports = {
                     }
                 });
 
+                let botNames = [];
+                client.guilds.cache.get(interaction.guild.id).members.cache.forEach(member => {
+                    if (member.user.bot) {
+                        botNames.push(member.user.username);
+                    }
+                })
+
                 let roles = interaction.guild.roles.cache.map(r => {
                     return {
                         label: `${r.name}`,
                         value: `${r.id}`
                     }
                 });
+
+                // filter roles to remove bots name roles
+                roles = roles.filter(role => !botNames.includes(role.label));
 
 
                 if (channels.length > 25) {

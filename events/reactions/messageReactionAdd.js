@@ -30,6 +30,7 @@ module.exports = async (client, messageReaction, user) => {
             // If the reaction is a checkmark, add the role to the user
             let member = messageReaction.message.guild.members.cache.get(user.id);
             let role = messageReaction.message.guild.roles.cache.get(data.role_id);
+
             member.roles.add(role);
 
             // send DM to user

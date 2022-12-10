@@ -31,7 +31,7 @@ module.exports = {
                     }
                 });
 
-                if (channels.length > 25) {
+                if (channels.length >= 25) {
                     channels.splice(24, channels.length - 23)
                 }
 

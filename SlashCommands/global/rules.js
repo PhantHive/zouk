@@ -49,11 +49,11 @@ module.exports = {
                 roles = roles.filter(role => !botNames.includes(role.label));
 
 
-                if (channels.length > 25) {
+                if (channels.length >= 25) {
                     channels.splice(24, channels.length - 23)
                 }
 
-                if (roles.length > 25) {
+                if (roles.length >= 25) {
                     roles.splice(24, roles.length - 23)
                 }
 

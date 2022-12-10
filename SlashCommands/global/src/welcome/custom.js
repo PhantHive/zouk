@@ -60,6 +60,11 @@ const customThemeWelcome = async (client, interaction) => {
                     label: "Phearion",
                     emoji: "879146014232170506",
                     value: "4"
+                },
+                {
+                    label: "Apocalypse",
+                    emoji: "830887343081783340",
+                    value: "5"
                 }
             )
     )
@@ -105,6 +110,11 @@ const customColorWelcome = async (client, interaction) => {
                         label: "Purple",
                         emoji: "💜",
                         value: "purple"
+                    },
+                    {
+                        label: "Black",
+                        emoji: "🖤",
+                        value: "black"
                     }
                 )
         )

@@ -1,4 +1,4 @@
-const RDB = require("../../utils/models/rules.js");
+const RDB = require("../../utils/models/Rules");
 const {EmbedBuilder} = require("discord.js");
 
 module.exports = async (client, messageReaction, user) => {
@@ -21,7 +21,7 @@ module.exports = async (client, messageReaction, user) => {
     // using RDB check if the message is a rules message and if it is, check if the reaction is a checkmark
     RDB.findOne({
         server_id: `${messageReaction.message.guild.id}`
-    }, async (err, data) => {
+    }, async (err, data) => new Promise((resolve, reject) => {
         if (err) {
             console.log(err);
             return;
@@ -29,9 +29,14 @@ module.exports = async (client, messageReaction, user) => {
         if (data && messageReaction.emoji.name === "✅") {
             // If the reaction is a checkmark, add the role to the user
             let member = messageReaction.message.guild.members.cache.get(user.id);
-            let role = messageReaction.message.guild.roles.cache.get(data.role_id);
 
-            member.roles.add(role);
+            try {
+                let role = messageReaction.message.guild.roles.cache.get(data.role_id);
+                member.roles.add(role)
+                    .catch(() => reject("Role not found: not set in /rules"));
+            } catch (error) {
+                reject("Role not found: not set in /rules");
+            }
 
             // send DM to user
             const embed = new EmbedBuilder()
@@ -42,8 +47,9 @@ module.exports = async (client, messageReaction, user) => {
                 .setFooter({ text: `Accepted by ${user.tag}`, iconURL: user.displayAvatarURL({ dynamic: true }) });
             member.send({ embeds: [embed] });
 
+            resolve();
         }
 
-    });
+    }));
 
 }

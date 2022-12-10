@@ -196,9 +196,7 @@ const isRoleValid = async (client, interaction, role_id) => new Promise((resolve
             reject(`You can't use a bot role as a verification role.`);
         }
     }
-    catch (err) {
-        reject(`Role is not valid.`);
-    }
+    catch (err) {}
 
 
     if (roleObj.position > botMember.roles.highest.position && roleObj.id === botMember.roles.highest.id) {
@@ -304,7 +302,7 @@ const chooseConfigWelcome = async (client, interaction, choice, isEdit) => {
                         }
                     });
 
-                    if (channels.length > 25) {
+                    if (channels.length >= 25) {
                         channels.splice(24, channels.length - 23)
                     }
 
@@ -369,7 +367,16 @@ const chooseConfigWelcome = async (client, interaction, choice, isEdit) => {
                             data.theme = parseInt(interaction.values[0]);
                             data.isEdit = false;
                             await data.save();
-                            await interaction.update({ content: `You have choosen ${themes[parseInt(interaction.values[0])]["name"]} as your welcome message theme.`, components: [] });
+                            let theme;
+                            try {
+                                theme = themes[parseInt(interaction.values[0])]["name"]
+                            }
+                            catch (e) {
+                                return interaction.update({ content: "A problem occured with the selected theme. Please try again later.", components: [] });
+
+                            }
+                            await interaction.update({ content: `You have choosen ${theme} as your welcome message theme.`, components: [] })
+
                             await wait(2000);
                             await customNextStep(client, interaction, data); // checking where to go next
                         }
@@ -424,7 +431,7 @@ const chooseConfigRules = async (client, interaction, choice, isEdit) => {
     // filter roles to remove bots name roles
     roles = roles.filter(role => !botNames.includes(role.label));
 
-    if (roles.length > 25) {
+    if (roles.length >= 25) {
         roles.splice(24, roles.length - 23)
     }
 
@@ -444,7 +451,7 @@ const chooseConfigRules = async (client, interaction, choice, isEdit) => {
                     }
                 });
 
-                if (channels.length > 25) {
+                if (channels.length >= 25) {
                     channels.splice(24, channels.length - 23)
                 }
 

@@ -98,7 +98,7 @@ const selectMessageRulesId = async (client, interaction, channelId) => new Promi
 });
 
 const selectRulesRoleId = async (client, interaction, roles) => {
-
+    console.log(roles.length);
     let actionRow = new ActionRowBuilder()
         .addComponents(
 

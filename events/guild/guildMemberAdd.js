@@ -166,9 +166,9 @@ module.exports = async (client, member) => {
                 ctx.fillStyle = guildColor;
                 ctx.fillText(member.guild.name, 0.485*canvas.width, 0.6*canvas.height);
                 // stroke the text
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 0.7;
                 ctx.strokeStyle = "#000000";
-                ctx.strokeText(member.guild.name, 0.5*canvas.width, 0.6*canvas.height);
+                ctx.strokeText(member.guild.name, 0.485*canvas.width, 0.6*canvas.height);
 
                 ctx.closePath();
 
@@ -209,35 +209,34 @@ module.exports = async (client, member) => {
                 font = applyText(canvas, "Z", 40);
                 ctx.font = font[0];
                 ctx.fillStyle = guildColor;
-                ctx.fillText("Z", 0.97*canvas.width - (font[1] / 2), 0.3*canvas.height);
                 font = applyText(canvas, "L", 40);
+                ctx.fillText("Z", 0.971*canvas.width - (font[1] / 2), 0.3*canvas.height);
                 ctx.font = font[0];
                 ctx.fillStyle = guildColor;
-                ctx.fillText("L", 0.97*canvas.width - (font[1] / 2), 0.4*canvas.height);
                 font = applyText(canvas, "7", 40);
+                ctx.fillText("L", 0.971*canvas.width - (font[1] / 2), 0.4*canvas.height);
                 ctx.font = font[0];
                 ctx.fillStyle = guildColor;
-                ctx.fillText("7", 0.97*canvas.width - (font[1] / 2), 0.5*canvas.height);
                 font = applyText(canvas, "7", 40);
+                ctx.fillText("7", 0.971*canvas.width - (font[1] / 2), 0.5*canvas.height);
                 ctx.font = font[0];
                 ctx.fillStyle = guildColor;
-                ctx.fillText("7", 0.97*canvas.width - (font[1] / 2), 0.6*canvas.height);
                 font = applyText(canvas, "7", 40);
+                ctx.fillText("7", 0.971*canvas.width - (font[1] / 2), 0.6*canvas.height);
                 ctx.font = font[0];
                 ctx.fillStyle = guildColor;
-                ctx.fillText("7", 0.97*canvas.width - (font[1] / 2), 0.7*canvas.height);
-
                 ctx.strokeStyle = 'rgb(0,0,0)';
-                ctx.lineWidth = 0.7;
-                ctx.strokeText("Z", 0.97*canvas.width - (font[1] / 2), 0.3*canvas.height);
-                ctx.strokeText("L", 0.97*canvas.width - (font[1] / 2), 0.4*canvas.height);
-                ctx.strokeText("7", 0.97*canvas.width - (font[1] / 2), 0.5*canvas.height);
-                ctx.strokeText("7", 0.97*canvas.width - (font[1] / 2), 0.6*canvas.height);
-                ctx.strokeText("7", 0.97*canvas.width - (font[1] / 2), 0.7*canvas.height);
-                ctx.closePath();
+               ctx.fillText("7", 0.971*canvas.width - (font[1] / 2), 0.7*canvas.height);
 
+               ctx.lineWidth = 0.7;
+               ctx.strokeText("Z", 0.971*canvas.width - (font[1] / 2), 0.3*canvas.height);
+               ctx.strokeText("L", 0.971*canvas.width - (font[1] / 2), 0.4*canvas.height);
+               ctx.strokeText("7", 0.971*canvas.width - (font[1] / 2), 0.5*canvas.height);
+               ctx.strokeText("7", 0.971*canvas.width - (font[1] / 2), 0.6*canvas.height);
+               ctx.strokeText("7", 0.971*canvas.width - (font[1] / 2), 0.7*canvas.height);
 
-                ctx.restore();
+               ctx.closePath();
+               ctx.restore();
 
 
                 ctx.beginPath();

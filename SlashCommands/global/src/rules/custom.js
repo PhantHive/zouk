@@ -80,7 +80,6 @@ const selectMessageRulesId = async (client, interaction, channelId) => new Promi
                         if (data) {
                             data.message_id = m.content;
                             channelId = data.channel_id;
-                            messageId = data.message_id;
                             data.save();
                         } else {
                             reject("Rules system is not setup on this server. Use /setup" );

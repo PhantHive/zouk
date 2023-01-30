@@ -131,7 +131,7 @@ module.exports = async (client, member) => {
                 ctx.shadowOffsetX = 2;
                 ctx.shadowOffsetY = 2;
 
-                ctx.font = applyText(canvas, member.user.tag)[0];
+                ctx.font = applyText(canvas, member.user.tag, null, 0.45)[0];
                 ctx.fillStyle = guildColor;
                 ctx.fillText(member.user.tag, 0.4*canvas.width, 0.5*canvas.height);
 
